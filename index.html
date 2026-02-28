@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شورتس عربي · لايك متكامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 800px;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff0050, #ff6b00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .search-icon {
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 60px;
+            left: 16px;
+            right: 16px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #333;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .search-item:hover {
+            background: #2a2a2a;
+        }
+
+        .search-item img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .video-feed {
+            height: 100%;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .video-feed::-webkit-scrollbar {
+            display: none;
+        }
+
+        .video-card {
+            height: 100vh;
+            max-height: 800px;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 15px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            color: white;
+            z-index: 10;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .channel-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #ff0050;
+            margin-left: 12px;
+            overflow: hidden;
+        }
+
+        .channel-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-details {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .channel-name:hover {
+            color: #ff0050;
+        }
+
+        .follow-btn {
+            background: #ff0050;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .follow-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .follow-btn.following {
+            background: #333;
+        }
+
+        .video-description {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .action-buttons {
+            position: absolute;
+            bottom: 120px;
+            left: 15px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .action-btn i {
+            font-size: 1.8rem;
+            background: rgba(0,0,0,0.6);
+            padding: 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn i:hover {
+            background: #ff0050;
+            transform: scale(1.1);
+        }
+
+        .action-btn i.liked {
+            color: #ff0050;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .action-btn span {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .comments-section {
+            background: #1a1a1a;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%;
+            transform: translateY(100%);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .comments-section.active {
+            transform: translateY(0);
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .close-comments {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ff0050;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #ff0050;
+        }
+
+        .comment-text {
+            font-size: 0.85rem;
+            color: #ddd;
+        }
+
+        .add-comment {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            position: sticky;
+            bottom: 0;
+            background: #1a1a1a;
+            padding: 10px 0;
+        }
+
+        .add-comment input {
+            flex: 1;
+            padding: 10px 15px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .add-comment input:focus {
+            outline: none;
+            border-color: #ff0050;
+        }
+
+        .add-comment button {
+            background: #ff0050;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .add-comment button:hover {
+            background: #ff3366;
+        }
+
+        .view {
+            display: none;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            background: #0a0a0a;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .channel-page {
+            background: #0a0a0a;
+            min-height: 100%;
+        }
+
+        .channel-header {
+            padding: 20px 15px;
+            text-align: center;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+        }
+
+        .channel-header-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            border: 3px solid #ff0050;
+            cursor: pointer;
+        }
+
+        .channel-header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-header-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .channel-header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .follow-channel-btn {
+            background: #ff0050;
+            color: white;
+            border: none;
+            padding: 10px 35px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .follow-channel-btn.following {
+            background: #333;
+        }
+
+        .upload-buttons {
+            display: flex;
+            gap: 8px;
+            padding: 15px;
+        }
+
+        .upload-btn {
+            background: #ff0050;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .tab.active {
+            color: #ff0050;
+            border-bottom: 2px solid #ff0050;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .video-thumb {
+            aspect-ratio: 9/16;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .video-thumb video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-thumb-stats {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 3px 6px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: #1e1e1e;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .post-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .subscriptions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 15px;
+        }
+
+        .subscription-card {
+            background: #121212;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .subscription-card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            border: 2px solid #ff0050;
+        }
+
+        .subscription-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1c1c1c;
+            width: 90%;
+            max-width: 350px;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .modal-content h3 {
+            color: #ff0050;
+            margin-bottom: 15px;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .file-input {
+            border: 2px dashed #444;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #ff0050;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+
+        .no-data i {
+            font-size: 3.5rem;
+            color: #ff0050;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f0f0f;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: #888;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item.active {
+            color: #ff0050;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="top-bar">
+        <div class="logo" onclick="showFeed()">شورتس</div>
+        <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+    </div>
+
+    <div class="search-results" id="searchResults"></div>
+
+    <div class="video-feed" id="videoFeed"></div>
+
+    <div id="channelView" class="view">
+        <div class="channel-page" id="channelContent"></div>
+    </div>
+
+    <div id="subscriptionsView" class="view">
+        <div id="subscriptionsContent"></div>
+    </div>
+
+    <div class="bottom-nav">
+        <i class="fas fa-home nav-item active" onclick="showFeed()"></i>
+        <i class="fas fa-heart nav-item" onclick="showSubscriptions()"></i>
+        <i class="fas fa-user nav-item" onclick="showMyChannel()"></i>
+    </div>
+
+    <div class="comments-section" id="commentsSection">
+        <div class="comments-header">
+            <h3>التعليقات</h3>
+            <i class="fas fa-times close-comments" onclick="closeComments()"></i>
+        </div>
+        <div class="comments-list" id="commentsList"></div>
+        <div class="add-comment">
+            <input type="text" placeholder="أضف تعليق..." id="commentInput">
+            <button onclick="addComment()">نشر</button>
+        </div>
+    </div>
+
+    <div class="modal" id="createChannelModal">
+        <div class="modal-content">
+            <h3>إنشاء قناة جديدة</h3>
+            <input type="text" placeholder="اسم القناة" id="channelNameInput">
+            <div class="file-input" onclick="document.getElementById('channelAvatar').click()">
+                <i class="fas fa-camera"></i> اختر صورة للقناة
+            </div>
+            <input type="file" id="channelAvatar" accept="image/*" class="hidden" onchange="handleChannelAvatar(event)">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="createChannel()">إنشاء</button>
+                <button class="btn-secondary" onclick="closeModal('createChannelModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadVideoModal">
+        <div class="modal-content">
+            <h3>رفع فيديو جديد</h3>
+            <input type="text" placeholder="عنوان الفيديو" id="videoTitleInput">
+            <textarea placeholder="وصف الفيديو" id="videoDescInput" rows="2"></textarea>
+            <div class="file-input" onclick="document.getElementById('videoFile').click()">
+                <i class="fas fa-video"></i> اختر فيديو
+            </div>
+            <input type="file" id="videoFile" accept="video/*" class="hidden" onchange="handleVideoSelect(event)">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="uploadVideo()">رفع</button>
+                <button class="btn-secondary" onclick="closeModal('uploadVideoModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadPhotoModal">
+        <div class="modal-content">
+            <h3>رفع صورة</h3>
+            <div class="file-input" onclick="document.getElementById('photoFile').click()">
+                <i class="fas fa-image"></i> اختر صورة
+            </div>
+            <input type="file" id="photoFile" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="uploadPhoto()">رفع</button>
+                <button class="btn-secondary" onclick="closeModal('uploadPhotoModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createPostModal">
+        <div class="modal-content">
+            <h3>إنشاء منشور</h3>
+            <textarea placeholder="محتوى المنشور" id="postContentInput" rows="2"></textarea>
+            <div class="file-input" onclick="document.getElementById('postImage').click()">
+                <i class="fas fa-image"></i> إضافة صورة (اختياري)
+            </div>
+            <input type="file" id="postImage" accept="image/*" class="hidden" onchange="handlePostImage(event)">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="createPost()">نشر</button>
+                <button class="btn-secondary" onclick="closeModal('createPostModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== قاعدة البيانات ====================
+    let channels = [];
+    let videos = [];
+    let currentUser = {
+        id: 'user1',
+        channel: null,
+        following: [],
+        likedVideos: [],
+        currentVideo: null
+    };
+
+    function loadData() {
+        const saved = localStorage.getItem('shortsData');
+        if (saved) {
+            const data = JSON.parse(saved);
+            channels = data.channels || [];
+            videos = data.videos || [];
+            currentUser = data.currentUser || {
+                id: 'user1',
+                channel: null,
+                following: [],
+                likedVideos: [],
+                currentVideo: null
+            };
+        }
+
+        if (channels.length === 0) {
+            channels = [
+                {
+                    id: 'ch1',
+                    name: 'سارة الطباخة',
+                    avatar: 'https://images.unsplash.com/photo-1494790108777-5fd4c0f23f3b?w=150',
+                    followers: 15200,
+                    videos: [],
+                    photos: [],
+                    posts: []
+                },
+                {
+                    id: 'ch2',
+                    name: 'أحمد للتكنولوجيا',
+                    avatar: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=150',
+                    followers: 28300,
+                    videos: [],
+                    photos: [],
+                    posts: []
+                }
+            ];
+            saveData();
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('shortsData', JSON.stringify({
+            channels,
+            videos,
+            currentUser
+        }));
+    }
+
+    // ==================== السكرول العمودي ====================
+    let currentPlayingVideo = null;
+
+    function initVideoFeed() {
+        const feed = document.getElementById('videoFeed');
+        feed.innerHTML = '';
+
+        if (videos.length === 0) {
+            feed.innerHTML = `
+                <div style="height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+                    <div>
+                        <i class="fas fa-video" style="font-size: 3rem; color: #ff0050; margin-bottom: 15px;"></i>
+                        <h3>لا توجد فيديوهات</h3>
+                        <p style="color: #888;">كن أول من يرفع فيديو</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        videos.forEach((video) => {
+            const channel = channels.find(c => c.id === video.channelId);
+            feed.appendChild(createVideoCard(video, channel));
+        });
+
+        setupScrollObserver();
+    }
+
+    function createVideoCard(video, channel) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.dataset.videoId = video.id;
+
+        const isFollowing = currentUser.following.includes(video.channelId);
+        const isLiked = currentUser.likedVideos.includes(video.id);
+
+        card.innerHTML = `
+            <video class="video-player" src="${video.videoData}" loop playsinline></video>
+            
+            <div class="video-overlay">
+                <div class="channel-info" onclick="showChannelPage('${video.channelId}')">
+                    <div class="channel-avatar">
+                        <img src="${channel ? channel.avatar : ''}">
+                    </div>
+                    <div class="channel-details">
+                        <div class="channel-name">${video.channelName}</div>
+                    </div>
+                </div>
+                <div class="video-description">
+                    ${video.title} ${video.description ? '- ' + video.description : ''}
+                </div>
+                <button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="event.stopPropagation(); toggleFollow('${video.channelId}', this)">
+                    ${isFollowing ? 'متابعة' : '+ متابعة'}
+                </button>
+            </div>
+
+            <div class="action-buttons">
+                <div class="action-btn" onclick="toggleLike('${video.id}', this)">
+                    <i class="fas fa-heart ${isLiked ? 'liked' : ''}"></i>
+                    <span class="like-count" id="like-${video.id}">${video.likes || 0}</span>
+                </div>
+                <div class="action-btn" onclick="openComments('${video.id}')">
+                    <i class="fas fa-comment"></i>
+                    <span>${video.comments ? video.comments.length : 0}</span>
+                </div>
+                <div class="action-btn" onclick="shareVideo('${video.id}')">
+                    <i class="fas fa-share"></i>
+                </div>
+            </div>
+        `;
+
+        return card;
+    }
+
+    function setupScrollObserver() {
+        const videos_cards = document.querySelectorAll('.video-card');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const video = entry.target.querySelector('video');
+                    if (video) {
+                        if (currentPlayingVideo && currentPlayingVideo !== video) {
+                            currentPlayingVideo.pause();
+                            currentPlayingVideo.currentTime = 0;
+                        }
+                        video.play().catch(() => {});
+                        currentPlayingVideo = video;
+                    }
+                } else {
+                    const video = entry.target.querySelector('video');
+                    if (video) {
+                        video.pause();
+                        video.currentTime = 0;
+                    }
+                }
+            });
+        }, { threshold: 0.6 });
+
+        videos_cards.forEach(card => observer.observe(card));
+    }
+
+    // ==================== زر اللايك المحسن مع حفظ في قاعدة البيانات ====================
+    function toggleLike(videoId, element) {
+        const video = videos.find(v => v.id === videoId);
+        if (!video) return;
+
+        const wasLiked = currentUser.likedVideos.includes(videoId);
+        const likeSpan = element.querySelector('.like-count');
+        
+        if (wasLiked) {
+            // إزالة اللايك
+            currentUser.likedVideos = currentUser.likedVideos.filter(id => id !== videoId);
+            video.likes = Math.max(0, (video.likes || 0) - 1);
+            element.querySelector('i').classList.remove('liked');
+        } else {
+            // إضافة لايك
+            currentUser.likedVideos.push(videoId);
+            video.likes = (video.likes || 0) + 1;
+            element.querySelector('i').classList.add('liked');
+        }
+
+        // تحديث العداد
+        if (likeSpan) {
+            likeSpan.textContent = video.likes;
+        }
+
+        // حفظ في قاعدة البيانات
+        saveData();
+
+        // تأثير بسيط
+        element.querySelector('i').style.transform = 'scale(1.3)';
+        setTimeout(() => {
+            element.querySelector('i').style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    // ==================== متابعة ====================
+    function toggleFollow(channelId, btn) {
+        const index = currentUser.following.indexOf(channelId);
+        const channel = channels.find(c => c.id === channelId);
+
+        if (index === -1) {
+            currentUser.following.push(channelId);
+            channel.followers++;
+            btn.textContent = 'متابعة';
+            btn.classList.add('following');
+        } else {
+            currentUser.following.splice(index, 1);
+            channel.followers--;
+            btn.textContent = '+ متابعة';
+            btn.classList.remove('following');
+        }
+
+        saveData();
+    }
+
+    // ==================== التعليقات ====================
+    let currentCommentVideo = null;
+
+    function openComments(videoId) {
+        currentCommentVideo = videoId;
+        const video = videos.find(v => v.id === videoId);
+        const commentsList = document.getElementById('commentsList');
+        
+        if (video && video.comments && video.comments.length > 0) {
+            commentsList.innerHTML = video.comments.map(c => `
+                <div class="comment-item">
+                    <div class="comment-avatar">
+                        <img src="${c.avatar || 'https://via.placeholder.com/50'}">
+                    </div>
+                    <div class="comment-content">
+                        <div class="comment-name">${c.name}</div>
+                        <div class="comment-text">${c.text}</div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            commentsList.innerHTML = '<div style="text-align: center; color: #888; padding: 30px;">لا توجد تعليقات بعد</div>';
+        }
+
+        document.getElementById('commentsSection').classList.add('active');
+    }
+
+    function closeComments() {
+        document.getElementById('commentsSection').classList.remove('active');
+    }
+
+    function addComment() {
+        const input = document.getElementById('commentInput');
+        const text = input.value.trim();
+        
+        if (!text || !currentCommentVideo) return;
+
+        const video = videos.find(v => v.id === currentCommentVideo);
+        if (video) {
+            if (!video.comments) video.comments = [];
+            
+            const newComment = {
+                name: currentUser.channel?.name || 'مستخدم',
+                avatar: currentUser.channel?.avatar || 'https://via.placeholder.com/50',
+                text: text
+            };
+            
+            video.comments.push(newComment);
+            
+            const commentsList = document.getElementById('commentsList');
+            if (commentsList.innerHTML.includes('لا توجد تعليقات')) {
+                commentsList.innerHTML = '';
+            }
+            
+            commentsList.innerHTML += `
+                <div class="comment-item">
+                    <div class="comment-avatar">
+                        <img src="${newComment.avatar}">
+                    </div>
+                    <div class="comment-content">
+                        <div class="comment-name">${newComment.name}</div>
+                        <div class="comment-text">${newComment.text}</div>
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            saveData();
+        }
+    }
+
+    // ==================== مشاركة ====================
+    function shareVideo(videoId) {
+        alert('✅ تم نسخ رابط الفيديو');
+    }
+
+    // ==================== البحث ====================
+    function toggleSearch() {
+        const results = document.getElementById('searchResults');
+        results.classList.toggle('active');
+        
+        if (results.classList.contains('active')) {
+            results.innerHTML = channels.map(c => `
+                <div class="search-item" onclick="showChannelPage('${c.id}'); results.classList.remove('active')">
+                    <img src="${c.avatar}">
+                    <div>
+                        <div style="font-weight: 600;">${c.name}</div>
+                        <div style="color: #888; font-size: 0.75rem;">${c.followers || 0} متابع</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // ==================== عرض صفحة القناة ====================
+    function showChannelPage(channelId) {
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel) return;
+
+        document.getElementById('videoFeed').style.display = 'none';
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('channelView').classList.add('active');
+        updateNav('channel');
+        
+        renderChannelPage(channelId);
+    }
+
+    function renderChannelPage(channelId) {
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel) return;
+
+        const isOwn = currentUser.channel?.id === channelId;
+        const isFollowing = currentUser.following.includes(channelId);
+        const channelVideos = videos.filter(v => v.channelId === channelId);
+
+        const container = document.getElementById('channelContent');
+        container.innerHTML = `
+            <div class="channel-header">
+                <div class="channel-header-avatar" onclick="${isOwn ? 'openModal(\'uploadPhotoModal\')' : ''}">
+                    <img src="${channel.avatar}">
+                </div>
+                <div class="channel-header-name">${channel.name}</div>
+                <div class="channel-header-stats">
+                    <span>📹 ${channelVideos.length}</span>
+                    <span>👥 ${channel.followers || 0}</span>
+                    <span>❤️ ${channelVideos.reduce((sum, v) => sum + (v.likes || 0), 0)}</span>
+                </div>
+                
+                ${!isOwn ? `
+                    <button class="follow-channel-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollowChannel('${channel.id}')">
+                        ${isFollowing ? 'متابعة' : '+ متابعة'}
+                    </button>
+                ` : ''}
+            </div>
+
+            ${isOwn ? `
+                <div class="upload-buttons">
+                    <button class="upload-btn" onclick="openModal('uploadVideoModal')"><i class="fas fa-video"></i> فيديو</button>
+                    <button class="upload-btn" onclick="openModal('uploadPhotoModal')"><i class="fas fa-image"></i> صورة</button>
+                    <button class="upload-btn" onclick="openModal('createPostModal')"><i class="fas fa-pen"></i> منشور</button>
+                </div>
+            ` : ''}
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchChannelTab('videos')">فيديوهات</div>
+                <div class="tab" onclick="switchChannelTab('photos')">صور</div>
+                <div class="tab" onclick="switchChannelTab('posts')">منشورات</div>
+            </div>
+
+            <div id="channelVideosTab" class="tab-content active">
+                <div class="videos-grid">
+                    ${channelVideos.map(v => `
+                        <div class="video-thumb" onclick="playVideoFromChannel('${v.videoData}')">
+                            <video src="${v.videoData}" muted></video>
+                            <div class="video-thumb-stats">❤️ ${v.likes || 0}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div id="channelPhotosTab" class="tab-content">
+                <div class="photos-grid">
+                    ${(channel.photos || []).map(p => `
+                        <div class="photo-item" onclick="viewImage('${p}')">
+                            <img src="${p}">
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div id="channelPostsTab" class="tab-content">
+                <div class="posts-list">
+                    ${(channel.posts || []).map(p => `
+                        <div class="post-card">
+                            <div class="post-header">
+                                <img src="${channel.avatar}" style="width: 35px; height: 35px; border-radius: 50%;">
+                                <strong>${channel.name}</strong>
+                            </div>
+                            <div>${p.content}</div>
+                            ${p.image ? `<img src="${p.image}" style="width: 100%; border-radius: 8px; margin-top: 10px;">` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            document.querySelectorAll('.video-thumb video').forEach(v => {
+                v.addEventListener('mouseenter', () => v.play());
+                v.addEventListener('mouseleave', () => {
+                    v.pause();
+                    v.currentTime = 0;
+                });
+            });
+        }, 100);
+    }
+
+    // ==================== عرض الاشتراكات ====================
+    function showSubscriptions() {
+        document.getElementById('videoFeed').style.display = 'none';
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('subscriptionsView').classList.add('active');
+        updateNav('subscriptions');
+        renderSubscriptions();
+    }
+
+    function renderSubscriptions() {
+        const container = document.getElementById('subscriptionsContent');
+        
+        if (currentUser.following.length === 0) {
+            container.innerHTML = `
+                <div class="no-data">
+                    <i class="fas fa-heart-broken"></i>
+                    <h3>لا توجد متابعات</h3>
+                    <p>تابع القنوات لمشاهدة محتواها هنا</p>
+                </div>
+            `;
+            return;
+        }
+
+        const followedChannels = channels.filter(c => currentUser.following.includes(c.id));
+        
+        container.innerHTML = `
+            <div style="padding: 15px;">
+                <h3 style="margin-bottom: 15px;">القنوات التي تتابعها (${followedChannels.length})</h3>
+                <div class="subscriptions-grid">
+                    ${followedChannels.map(c => `
+                        <div class="subscription-card" onclick="showChannelPage('${c.id}')">
+                            <img src="${c.avatar}">
+                            <h4>${c.name}</h4>
+                            <p style="color: #888; font-size: 0.8rem;">${c.followers || 0} متابع</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // ==================== عرض الصفحة الرئيسية ====================
+    function showFeed() {
+        document.getElementById('videoFeed').style.display = 'block';
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        updateNav('feed');
+        initVideoFeed();
+    }
+
+    function showMyChannel() {
+        if (!currentUser.channel) {
+            openModal('createChannelModal');
+            return;
+        }
+        showChannelPage(currentUser.channel.id);
+    }
+
+    function updateNav(active) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (active === 'feed') document.querySelector('.fa-home').classList.add('active');
+        else if (active === 'subscriptions') document.querySelector('.fa-heart').classList.add('active');
+        else if (active === 'channel') document.querySelector('.fa-user').classList.add('active');
+    }
+
+    // ==================== إنشاء قناة ====================
+    let selectedChannelAvatar = null;
+
+    function handleChannelAvatar(event) {
+        selectedChannelAvatar = event.target.files[0];
+    }
+
+    function createChannel() {
+        const name = document.getElementById('channelNameInput').value.trim();
+        if (!name) {
+            alert('الرجاء إدخال اسم القناة');
+            return;
+        }
+
+        let avatarUrl = 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=150';
+        
+        if (selectedChannelAvatar) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                saveNewChannel(name, e.target.result);
+            };
+            reader.readAsDataURL(selectedChannelAvatar);
+        } else {
+            saveNewChannel(name, avatarUrl);
+        }
+    }
+
+    function saveNewChannel(name, avatarUrl) {
+        const newChannel = {
+            id: 'ch' + Date.now(),
+            name: name,
+            avatar: avatarUrl,
+            followers: 0,
+            videos: [],
+            photos: [],
+            posts: []
+        };
+
+        channels.push(newChannel);
+        currentUser.channel = newChannel;
+        saveData();
+
+        closeModal('createChannelModal');
+        showMyChannel();
+        alert('✅ تم إنشاء القناة بنجاح');
+    }
+
+    // ==================== رفع فيديو ====================
+    let selectedVideoFile = null;
+
+    function handleVideoSelect(event) {
+        selectedVideoFile = event.target.files[0];
+        if (selectedVideoFile) {
+            alert('تم اختيار الفيديو: ' + selectedVideoFile.name);
+        }
+    }
+
+    function uploadVideo() {
+        if (!currentUser.channel) {
+            alert('يجب إنشاء قناة أولاً');
+            return;
+        }
+
+        const title = document.getElementById('videoTitleInput').value.trim();
+        if (!title || !selectedVideoFile) {
+            alert('الرجاء إدخال عنوان واختيار فيديو');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const newVideo = {
+                id: 'v' + Date.now(),
+                title: title,
+                description: document.getElementById('videoDescInput').value,
+                videoData: e.target.result,
+                channelId: currentUser.channel.id,
+                channelName: currentUser.channel.name,
+                likes: 0,
+                comments: []
+            };
+
+            videos.push(newVideo);
+            saveData();
+
+            closeModal('uploadVideoModal');
+            document.getElementById('videoTitleInput').value = '';
+            document.getElementById('videoDescInput').value = '';
+            selectedVideoFile = null;
+
+            alert('✅ تم رفع الفيديو بنجاح!');
+            showFeed();
+        };
+        reader.readAsDataURL(selectedVideoFile);
+    }
+
+    // ==================== رفع صورة ====================
+    let selectedPhotoFile = null;
+
+    function handlePhotoSelect(event) {
+        selectedPhotoFile = event.target.files[0];
+    }
+
+    function uploadPhoto() {
+        if (!currentUser.channel || !selectedPhotoFile) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (!currentUser.channel.photos) currentUser.channel.photos = [];
+            currentUser.channel.photos.push(e.target.result);
+            
+            const channelIndex = channels.findIndex(c => c.id === currentUser.channel.id);
+            channels[channelIndex] = currentUser.channel;
+            
+            saveData();
+            closeModal('uploadPhotoModal');
+            showMyChannel();
+            alert('✅ تم رفع الصورة بنجاح');
+        };
+        reader.readAsDataURL(selectedPhotoFile);
+    }
+
+    // ==================== إنشاء منشور ====================
+    let selectedPostImage = null;
+
+    function handlePostImage(event) {
+        selectedPostImage = event.target.files[0];
+    }
+
+    function createPost() {
+        if (!currentUser.channel) return;
+
+        const content = document.getElementById('postContentInput').value.trim();
+        if (!content) {
+            alert('الرجاء كتابة محتوى المنشور');
+            return;
+        }
+
+        if (selectedPostImage) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(content, e.target.result);
+            };
+            reader.readAsDataURL(selectedPostImage);
+        } else {
+            savePost(content, null);
+        }
+    }
+
+    function savePost(content, imageUrl) {
+        if (!currentUser.channel.posts) currentUser.channel.posts = [];
+        
+        const newPost = {
+            id: 'p' + Date.now(),
+            content: content,
+            image: imageUrl
+        };
+
+        currentUser.channel.posts.push(newPost);
+        
+        const channelIndex = channels.findIndex(c => c.id === currentUser.channel.id);
+        channels[channelIndex] = currentUser.channel;
+        
+        saveData();
+        closeModal('createPostModal');
+        document.getElementById('postContentInput').value = '';
+        selectedPostImage = null;
+        showMyChannel();
+        alert('✅ تم نشر المنشور');
+    }
+
+    // ==================== دوال مساعدة ====================
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function switchChannelTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        if (tab === 'videos') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('channelVideosTab').classList.add('active');
+        } else if (tab === 'photos') {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('channelPhotosTab').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[2].classList.add('active');
+            document.getElementById('channelPostsTab').classList.add('active');
+        }
+    }
+
+    function toggleFollowChannel(channelId) {
+        const channel = channels.find(c => c.id === channelId);
+        const index = currentUser.following.indexOf(channelId);
+        
+        if (index === -1) {
+            currentUser.following.push(channelId);
+            channel.followers++;
+        } else {
+            currentUser.following.splice(index, 1);
+            channel.followers--;
+        }
+        
+        saveData();
+        renderChannelPage(channelId);
+    }
+
+    function playVideoFromChannel(videoData) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'black';
+        modal.style.zIndex = '2000';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.innerHTML = `
+            <video src="${videoData}" style="width: 100%; max-width: 400px; max-height: 90vh; object-fit: contain;" controls autoplay></video>
+            <button style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;" onclick="this.parentElement.remove()">×</button>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    function viewImage(imageUrl) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'rgba(0,0,0,0.95)';
+        modal.style.zIndex = '2000';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.innerHTML = `
+            <img src="${imageUrl}" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+            <button style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;" onclick="this.parentElement.remove()">×</button>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // ==================== التهيئة ====================
+    loadData();
+    showFeed();
+
+    // جعل الدوال عامة
+    window.showFeed = showFeed;
+    window.showSubscriptions = showSubscriptions;
+    window.showMyChannel = showMyChannel;
+    window.showChannelPage = showChannelPage;
+    window.toggleSearch = toggleSearch;
+    window.toggleFollow = toggleFollow;
+    window.toggleLike = toggleLike;
+    window.openComments = openComments;
+    window.closeComments = closeComments;
+    window.addComment = addComment;
+    window.shareVideo = shareVideo;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.handleChannelAvatar = handleChannelAvatar;
+    window.createChannel = createChannel;
+    window.handleVideoSelect = handleVideoSelect;
+    window.uploadVideo = uploadVideo;
+    window.handlePhotoSelect = handlePhotoSelect;
+    window.uploadPhoto = uploadPhoto;
+    window.handlePostImage = handlePostImage;
+    window.createPost = createPost;
+    window.switchChannelTab = switchChannelTab;
+    window.toggleFollowChannel = toggleFollowChannel;
+    window.playVideoFromChannel = playVideoFromChannel;
+    window.viewImage = viewImage;
+</script>
+</body>
+</html>
